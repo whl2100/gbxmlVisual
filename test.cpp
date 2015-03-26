@@ -1794,7 +1794,7 @@ void test::addToTxt(cv::Point3d WorldPoint,double theta)
 void test::addToTxtComplete(cv::Point3d WorldPoint,double theta,double timestamp,int index)
 {
 	GroundTruth2D.precision(15);
-	GroundTruth2D<<timestamp<<","<<index<<","<<WorldPoint.x << ","<<WorldPoint.y<<","<<WorldPoint.z<<","<<theta<<","<<midpointWorld.x<<","<<midpointWorld.y<<","<<midpointWorld.z<<","<<((WorldPoint.y-midpointWorld.y)/(WorldPoint.z-midpointWorld.z))<<std::endl;
+	GroundTruth2D<<timestamp<<","<<index<<","<<WorldPoint.x << ","<<WorldPoint.y<<","<<WorldPoint.z<<","<<theta<<","<<midpointWorld.x<<","<<midpointWorld.y<<","<<midpointWorld.z<<","<</*((WorldPoint.y-midpointWorld.y)/(WorldPoint.z-midpointWorld.z))<<*/std::endl;
 
 }
 
@@ -1903,7 +1903,7 @@ double test::CalculateAngle(cv::Point3d pt1,cv::Point3d pt2)
 	
 	
 	}
-	else if(pt2.z==pt1.z)
+	else if(pt2.x==pt1.x)
 	{
 		if(pt2.y > pt1.y)
 		{
@@ -1922,25 +1922,25 @@ double test::CalculateAngle(cv::Point3d pt1,cv::Point3d pt2)
 	else
 	{
 		
-		theta= std::atan(	(	(pt2.y-pt1.y)/(pt2.z-pt1.z)		)	);
+		theta= std::atan(	(	(pt2.y-pt1.y)/(pt2.x-pt1.x)		)	);
 		theta=theta*(180/M_PI);
 
-		if((pt1.z>pt2.z)&&(pt1.y>pt2.y))
+		if((pt1.x>pt2.x)&&(pt1.y>pt2.y))
 		{
 			theta=theta*(+1);
 		
 		}
-		else if((pt2.z>pt1.z)&&(pt2.y<pt1.y))
+		else if((pt2.x>pt1.x)&&(pt2.y<pt1.y))
 		{
 			
 			theta=theta*(+1);
 		}
-		else if((pt2.z>pt1.z)&&(pt2.y>pt1.y))
+		else if((pt2.x>pt1.x)&&(pt2.y>pt1.y))
 		{
 			
 			theta=theta*(-1);
 		}
-		else if((pt2.z<pt1.z)&&(pt2.y>pt1.y))
+		else if((pt2.x<pt1.x)&&(pt2.y>pt1.y))
 		{
 			
 			theta=theta*(-1);
