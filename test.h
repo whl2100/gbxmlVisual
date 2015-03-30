@@ -73,8 +73,9 @@ public:
 	cv::Point3d test::transformFromCameraToWorld(cv::Point3d pt3d);
 	double test::CalcEuclDistance(cv::Point3d pt1,cv::Point3d pt2);
 	double test::CalculateAngle(cv::Point3d pt1,cv::Point3d pt2);
-	void test::addToTxtComplete(cv::Point3d WorldPoint,double theta,double timestamp,int index);
+	void test::addToTxtComplete(cv::Point3d WorldPoint,double theta,double timestamp,int index,double theta_sequential);
 	void test::addToTxtComplete();
+	cv::Mat test::calculateHomography();
 	//void test::BatchProcessing();
 	//end tracking//
 

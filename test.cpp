@@ -1146,6 +1146,7 @@ void test::start_tracking()
 	cv::Mat frame,frame_thresholded,frame_depth,frame_color;
 	cv::Mat tmpR, tmpT;
 	cv::Point3d WorldPoint;//world
+	std::vector<cv::Point2f> pointsHomography;
 
 
 	filenameToDisp = dpt.getFrame(SeqIndexData[index_tracking][0]); //seqIndex's first column contains timestamps used for dpt.getFrame() to return the name of .png file to process
@@ -1200,6 +1201,22 @@ void test::start_tracking()
 	//calculate contour centroids
 	centroids = calculateContourCentroids(contours,frame_depth);
 
+
+	//testing homography
+	if(centroids.size()==3)
+	{
+		for (size_t idx=0;idx<centroids.size();idx++)
+		{
+			cv::Point2f tempPoints;
+			tempPoints.x=centroids[idx].first;
+			tempPoints.y=centroids[idx].second;
+			pointsHomography.push_back(tempPoints);
+		
+		}
+	}
+
+
+
 	if ((centroids[0].first!=0)&&(centroids[0].second!=0))
 	{
 
@@ -1251,14 +1268,14 @@ void test::start_tracking()
 		WorldPoint.z = (float)(pt3d.x * tmpR.at<float>(2,0) + pt3d.y * tmpR.at<float>(2,1) + pt3d.z * tmpR.at<float>(2,2)) + tmpT.at<float>(2)/1000;
 
 
-		//double theta=CalculateAngleBetweenFrames(prevFramePoint,WorldPoint);
+		double theta_sequential=CalculateAngleBetweenFrames(prevFramePoint,WorldPoint);
 		double theta=test::CalculateAngle(midpointWorld,WorldPoint);
 
-		//prevFramePoint=WorldPoint;
+		prevFramePoint=WorldPoint;
 
 
 		//addToTxt(WorldPoint,theta);
-		addToTxtComplete(WorldPoint,theta,SeqIndexData[index_tracking][0],index_tracking);
+		addToTxtComplete(WorldPoint,theta,SeqIndexData[index_tracking][0],index_tracking,theta_sequential);
 		std::cout<<index_tracking<<"#############	"<<theta/**180/M_PI*/<<std::endl;
 	}
 	else
@@ -1791,10 +1808,10 @@ void test::addToTxt(cv::Point3d WorldPoint,double theta)
 
 }
 
-void test::addToTxtComplete(cv::Point3d WorldPoint,double theta,double timestamp,int index)
+void test::addToTxtComplete(cv::Point3d WorldPoint,double theta,double timestamp,int index,double theta_sequential)
 {
 	GroundTruth2D.precision(15);
-	GroundTruth2D<<timestamp<<","<<index<<","<<WorldPoint.x << ","<<WorldPoint.y<<","<<WorldPoint.z<<","<<theta<<","<<midpointWorld.x<<","<<midpointWorld.y<<","<<midpointWorld.z<<","<</*((WorldPoint.y-midpointWorld.y)/(WorldPoint.z-midpointWorld.z))<<*/std::endl;
+	GroundTruth2D<<timestamp<<","<<index<<","<<WorldPoint.x << ","<<WorldPoint.y<<","<<WorldPoint.z<<","<<theta<<","<<theta_sequential<<","<<midpointWorld.x<<","<<midpointWorld.y<<","<<midpointWorld.z<</*","<<((WorldPoint.y-midpointWorld.y)/(WorldPoint.z-midpointWorld.z))<<*/std::endl;
 
 }
 
@@ -1823,7 +1840,7 @@ double test::CalculateAngleBetweenFrames(cv::Point3d pt1,cv::Point3d pt2)
 
 	if (pt1!=pt2)
 	{
-		double theta= std::atan(		((pt2.z-pt1.z)/(pt2.y-pt1.y))		); //Angle formula
+		double theta= std::atan(		((pt2.y-pt1.y)/(pt2.x-pt1.x))		); //Angle formula
 		return theta;
 	}
 	else
@@ -1894,6 +1911,13 @@ double test::CalcEuclDistance(cv::Point3d pt1,cv::Point3d pt2)
 //
 //}
 
+cv::Mat test::calculateHomography()
+{
+	cv::Mat H;
+
+	return H;
+}
+
 double test::CalculateAngle(cv::Point3d pt1,cv::Point3d pt2)
 {
 	double theta;
@@ -1925,7 +1949,8 @@ double test::CalculateAngle(cv::Point3d pt1,cv::Point3d pt2)
 		theta= std::atan(	(	(pt2.y-pt1.y)/(pt2.x-pt1.x)		)	);
 		theta=theta*(180/M_PI);
 
-		if((pt1.x>pt2.x)&&(pt1.y>pt2.y))
+		//commented out for glory
+		/*if((pt1.x>pt2.x)&&(pt1.y>pt2.y))
 		{
 			theta=theta*(+1);
 		
@@ -1944,18 +1969,8 @@ double test::CalculateAngle(cv::Point3d pt1,cv::Point3d pt2)
 		{
 			
 			theta=theta*(-1);
-		}
+		}*/
 
-		//if(pt2.y > pt1.y)
-		//{
-		//
-		//	//theta=theta*(-1);
-		//}
-		//else
-		//{
-		//	theta=theta*(-1);
-		//}
-	
 	
 	}
 
